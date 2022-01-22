@@ -23,7 +23,26 @@ export function getInterview(state, interview) {
   }
   const interviewer = state.interviewers[interview.interviewer];
   return {
-    student: interviewer.name,
+    student: interview.student,
     interviewer
   }
+}
+
+export function getInterviewersForDay(state, day) {
+  //... returns an array of appointments for that day
+  const filteredDay = state.days.filter((d) => d.name === day);
+
+  if (filteredDay.length === 0) {
+    return [];
+  }
+  const interviewerIds = filteredDay[0].interviewers;
+
+  const interviewers = [];
+
+  for (const id of interviewerIds) {
+    if (state.interviewers[id]) {
+      interviewers.push(state.interviewers[id]);
+    }
+  }
+  return interviewers;
 }
