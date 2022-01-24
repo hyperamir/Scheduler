@@ -9,8 +9,6 @@ import { getInterview } from "helpers/selectors";
 
 
 export default function Application(props) {
-  // const [day, setDay] = useState('Monday');
-  // const [days, setDays] = useState([]);
   const [state, setState] = useState({
     day: "Monday",
     days: [],
@@ -18,10 +16,7 @@ export default function Application(props) {
     interviewers: {}
   });
 
-  let dailyAppointments = [];
-
   const setDay = day => setState({ ...state, day });
-  //const setDays = days => setState(prev => ({ ...prev, days }));
 
   useEffect(() => {
     Promise.all([
@@ -38,19 +33,51 @@ export default function Application(props) {
       })
   }, []);
 
-  // dailyAppointments = getAppointmentsForDay(state, state.day);
-  // console.log('dailyAppointments: ', dailyAppointments )
-  // const parsedAppointments = dailyAppointments.map((appointment) => {
-  //   return (
-  //     <Appointment key={appointment.id} {...appointment} />
-  //   )
-  // })
 
   const appointments = getAppointmentsForDay(state, state.day);
   const interviewersForDay = getInterviewersForDay(state, state.day);
 
   const schedule = appointments.map((appointment) => {
     const interview = getInterview(state, appointment.interview);
+
+
+    function bookInterview(id, interview) {
+      const appointment = {
+        ...state.appointments[id],
+        interview: { ...interview }
+      };
+
+      const appointments = {
+        ...state.appointments,
+        [id]: appointment
+      };
+
+
+      return axios.put(`/api/appointments/${id}`, { interview })
+        .then(response => {
+          setState({
+            ...state,
+            appointments
+          });
+        })
+    }
+
+    function cancelInterview(id) {
+      const appointment = state.appointments[id];
+      const cancelAppointment = { ...appointment };
+      cancelAppointment.interview = null;
+
+      const newAppointments = { ...state.appointments }
+      newAppointments[id] = cancelAppointment;
+
+      return axios.delete(`/api/appointments/${id}`)
+        .then(response => {
+          setState({
+            ...state,
+            appointments: newAppointments
+          })
+        })
+    }
 
     return (
       <Appointment
@@ -59,6 +86,8 @@ export default function Application(props) {
         time={appointment.time}
         interview={interview}
         interviewers={interviewersForDay}
+        bookInterview={bookInterview}
+        cancelInterview={cancelInterview}
       />
     );
   });
