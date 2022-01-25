@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 
 export default function useApplicationData() {
@@ -9,7 +9,6 @@ export default function useApplicationData() {
     appointments: {},
     interviewers: {}
   });
-  console.log(state)
 
   const setDay = day => setState({ ...state, day });
 
@@ -39,18 +38,44 @@ export default function useApplicationData() {
       [id]: appointment
     };
 
-    // for(appointment in state.appointments){
-    //   if()
-    // }
-
     return axios.put(`/api/appointments/${id}`, { interview })
       .then(response => {
+
+        const updatedDays = updateSpots(appointments, state.days);
         setState({
           ...state,
-          appointments
+          appointments,
+          days: updatedDays
         });
       })
   }
+
+  const updateSpots = (appointments, days) => {
+    let appointmentsId = [];
+    let newSpotsCount = 0;
+    const updatedDays = days.map((singleDay) => {
+      if (singleDay.name === state.day) {
+        appointmentsId = singleDay.appointments;
+
+        for (let singleAppointmentKey in appointments) {
+          const singleAppointment = appointments[singleAppointmentKey];
+
+          if (appointmentsId.includes(singleAppointment.id)) {
+
+            if (!singleAppointment.interview) {
+              newSpotsCount++;
+
+            }
+          }
+        }
+        singleDay.spots = newSpotsCount;
+      }
+      return singleDay;
+    });
+
+    return updatedDays;
+  }
+
 
   function cancelInterview(id) {
     const appointment = state.appointments[id];
@@ -60,11 +85,14 @@ export default function useApplicationData() {
     const newAppointments = { ...state.appointments }
     newAppointments[id] = cancelAppointment;
 
+
     return axios.delete(`/api/appointments/${id}`)
       .then(response => {
+        const updatedDays = updateSpots(newAppointments, state.days);
         setState({
           ...state,
-          appointments: newAppointments
+          appointments: newAppointments,
+          days: updatedDays
         })
       })
   }
