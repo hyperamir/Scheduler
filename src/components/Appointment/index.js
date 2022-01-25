@@ -33,14 +33,14 @@ export default function Appointment(props) {
     transition(SAVING);
     props.bookInterview(props.id, interview)
       .then(() => transition(SHOW))
-      .catch(() => transition(ERROR_SAVE, true));
+      .catch(error => transition(ERROR_SAVE, true));
   }
 
-  function cancel() {
+  function destroy() {
     transition(DELETE, true);
     props.cancelInterview(props.id)
       .then(() => transition(EMPTY))
-      .catch(() => transition(ERROR_DELETE,true))
+      .catch(error => transition(ERROR_DELETE,true))
   }
 
   return (
@@ -67,7 +67,7 @@ export default function Appointment(props) {
         <Confirm
           message={'Are you sure you would like to delete?'}
           onCancel={back}
-          onConfirm={cancel}
+          onConfirm={destroy}
         />)}
       {mode === EDIT && (
         <Form
