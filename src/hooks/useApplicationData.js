@@ -41,7 +41,7 @@ export default function useApplicationData() {
     return axios.put(`/api/appointments/${id}`, { interview })
       .then(response => {
 
-        const updatedDays = updateSpots(appointments, state.days);
+        const updatedDays = updateSpots(state, appointments);
         setState({
           ...state,
           appointments,
@@ -50,31 +50,29 @@ export default function useApplicationData() {
       })
   }
 
-  const updateSpots = (appointments, days) => {
-    let appointmentsId = [];
-    let newSpotsCount = 0;
-    const updatedDays = days.map((singleDay) => {
-      if (singleDay.name === state.day) {
-        appointmentsId = singleDay.appointments;
 
-        for (let singleAppointmentKey in appointments) {
-          const singleAppointment = appointments[singleAppointmentKey];
-
-          if (appointmentsId.includes(singleAppointment.id)) {
-
-            if (!singleAppointment.interview) {
-              newSpotsCount++;
-
-            }
-          }
-        }
-        singleDay.spots = newSpotsCount;
+  const getSpotsForDay = function (dayObj, appointments) {
+    let spots = 0;
+    for (const id of dayObj.appointments) {
+      const appointment = appointments[id];
+      if (!appointment.interview) {
+        spots++;
       }
-      return singleDay;
-    });
-
-    return updatedDays;
+    }
+    return spots;
   }
+
+  const updateSpots = function (state, appointments, id) {
+  
+    const dayObj = state.days.find(day => day.name === state.day);
+    const spots = getSpotsForDay(dayObj, appointments);
+  
+    const day = { ...dayObj, spots };
+  
+    const newDays = state.days.map(d => d.name === state.day ? day : d);
+  
+    return newDays;
+  };
 
 
   function cancelInterview(id) {
@@ -88,7 +86,7 @@ export default function useApplicationData() {
 
     return axios.delete(`/api/appointments/${id}`)
       .then(response => {
-        const updatedDays = updateSpots(newAppointments, state.days);
+        const updatedDays = updateSpots(state, newAppointments);
         setState({
           ...state,
           appointments: newAppointments,
