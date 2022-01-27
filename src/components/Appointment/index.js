@@ -84,7 +84,6 @@ export default function Appointment(props) {
         message={"Error happend while Saving."}
         onClose={back} />}
 
-      {/* {props.interview ? <Show student={props.interview.student} interviewer={props.interview.interviewer.name} /> : <Empty />} */}
     </article>
   );
 }
