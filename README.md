@@ -17,15 +17,18 @@ Interview Scheduler is a SPA (Single Page Application) for tracking students int
 
 ## Screenshots
 
-- Main page - List of days
+
+- ### Main page - List of days
 
 ![Main page - List of days](https://github.com/hyperamir/Scheduler/blob/master/docs/Main-page.png?raw=true)
 
-- Appointment form - Create
+
+- ### Appointment form - Create
 
 ![Appointment form - Create](https://github.com/hyperamir/Scheduler/blob/master/docs/Appointment-form.png?raw=true)
 
-- Cancel an appointment
+
+-  ### Cancel an appointment
 
 ![Cancel an appointment](https://github.com/hyperamir/Scheduler/blob/master/docs/Cancel-appointment.png?raw=true)
 
